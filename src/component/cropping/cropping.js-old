@@ -1,0 +1,34 @@
+import React, { useEffect, useState } from 'react';
+import Cropper from "cropperjs";
+import 'cropperjs/dist/cropper.css';
+
+const Cropping = () => {
+    const imgStyle = {
+        display: 'block',
+        maxWidth: '100%'
+    }
+    
+    let cropping = () => {
+        const image = document.getElementById('croppingimg');
+    
+        const cropper = new Cropper(image, {
+            aspectRatio: 16 / 9,
+            viewMode: 0,
+            ready() {
+                this.cropper.move(1, -1);
+                this.cropper.crop();
+            }
+        });
+    }
+    
+    return (
+        <>
+            <div>
+                <img src={`${process.env.PUBLIC_URL}/images/five.jpg`} alt={"croppingimg"} style={imgStyle} id="croppingimg"/>
+            </div>
+            <button onClick={() => cropping()} >Crop</button>
+        </>
+    
+    )}
+    
+export default Cropping;

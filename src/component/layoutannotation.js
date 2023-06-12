@@ -1,9 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useRef } from 'react';
 import './layoutannotation.css';
 import './rectangle.css'
 import Canvas from 'containers/Canvas';
 
-const Layout = ({ children }) => {
+import ReactCrop, {
+    centerCrop,
+    makeAspectCrop,
+    Crop,
+    PixelCrop} from 'react-image-crop';
+import canvasPreview from './cropping/canvasPreview';
+import 'react-image-crop/dist/ReactCrop.css';
+
+const Layout = () => {
     const [show, toggleShow] = useState(true);
     const [annotationType, setAnnotationType] = useState(null);
     const [annotations, setAnnotations] = useState([]);
@@ -71,9 +79,6 @@ const Layout = ({ children }) => {
         // const elem = document.getElementsByClassName('img-magnifier-glass')
         const elem = document.getElementsByClassName('icon-wrapper')
 
-
-        console.log((elem), 'rm to this')
-        // elem.parentNode.removeChild(elem);
     }
 
     let onChangeImage = () => {
@@ -97,7 +102,86 @@ const Layout = ({ children }) => {
         setRectanglePosition(null);
     };
 
-        const [isMagnifier, setIsMagnifier] = useState(false)
+    const [zoom, setZoom] = useState(1)
+const [cropSec, setCropSec] = useState(false)
+const [annotationSec, setAnnotationSec] = useState(false)
+const [magnifierSec, setMegnifierSec] = useState(false)
+const [polygonSec, setPolygonSec] = useState(false);
+// const [annotations, setAnnotations] = useState([])
+const [annotation, setAnnotation] = useState({})
+const [crop, setCrop] = useState();
+const [completedCrop, setCompletedCrop] = useState({ width:0, height:0})
+const previewCanvasRef = useRef(null)
+const imgRef = useRef(null)
+const hiddenAnchorRef = useRef(null)
+const blobUrlRef = useRef('')
+const cropperRef = useRef(null);
+const [scale, setScale] = useState(1)
+const [rotate, setRotate] = useState(0)
+const onCrop = () => {
+    const cropper = cropperRef.current?.cropper;
+    console.log(cropper.getCroppedCanvas().toDataURL());
+};
+
+const onChange = (annotation)=> {
+    setAnnotation(annotation)
+}
+
+const onSubmit = (annotation)=> {
+    const { geometry, data } = annotation
+    setAnnotations(annotations.concat({
+        geometry,
+        data: {
+          ...data,
+          id: Math.random()
+        }
+    }))
+}
+
+const onDownloadCropClick = ()=> {
+    if (!previewCanvasRef.current) {
+      throw new Error('Crop canvas does not exist')
+    }
+
+    previewCanvasRef.current.toBlob((blob) => {
+      if (!blob) {
+        throw new Error('Failed to create blob')
+      }
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current)
+      }
+      console.log("Vikas=",blobUrlRef);
+      blobUrlRef.current = URL.createObjectURL(blob)
+      hiddenAnchorRef.current.href = blobUrlRef.current
+      hiddenAnchorRef.current.click()
+    })
+}
+
+useEffect(() => {
+    if (
+      completedCrop?.width &&
+      completedCrop?.height &&
+      imgRef.current &&
+      previewCanvasRef.current
+    ) {
+      // We use canvasPreview as it's much faster than imgPreview.
+      canvasPreview(
+        imgRef.current,
+        previewCanvasRef.current,
+        completedCrop,
+        scale,
+        rotate,
+      )
+    }
+  })
+
+  const cropStyle = {
+                     width: '120%', 
+                     height: '500px',
+                    }
+
+
+    const [isMagnifier, setIsMagnifier] = useState(false)
     const [isCropImage, setIsCropImage] = useState(false)
     const [isRect, setIsRect] = useState(false)
     const [isPolygon,setIsPolygone] = useState(false)
@@ -189,7 +273,7 @@ const Layout = ({ children }) => {
                     <div className='icon-container'><i className="icon bi bi-zoom-out"></i></div>
                     <div className='icon-container'><i className="icon bi bi-clipboard"></i></div>
                     <div className='icon-container'><i className="icon bi bi-clipboard2-check-fill"></i></div>
-                    <div className={`icon-container ${isCropImage ? 'icon-bg' : ''}`} onClick={() => { initFun(); setIsCropImage(!isCropImage) }}><i className="icon bi bi-crop"></i></div>
+                    <div className={`icon-container ${isCropImage ? 'icon-bg' : ''}`} onClick={() => { initFun(); setIsCropImage(!isCropImage) }}><i className="icon bi bi-crop" ></i></div>
                     <div className='icon-container'><i className="icon bi bi-arrow-counterclockwise"></i></div>
                     <div className='icon-container'><i className="icon bi bi-arrow-clockwise"></i></div>
                     <div className={`icon-container ${isRect ? 'icon-bg' : ''}`} onClick={() => { initFun(); setIsRect(!isRect) }}><i className="icon bi bi-square"></i></div>
@@ -224,7 +308,7 @@ const Layout = ({ children }) => {
                        <td >
                             <div className='main_wrapper' onClick={(e) => { clickRectHandle(e) }} onMouseMove={(e) => { mouseMoveRectHandle(e) }}>
                                 {/* magnifier */}
-                                <div onClick={() => removeMagnifire()} className='img-magnifier-container' >
+                                <div onClick={() => removeMagnifire()} className={`img-magnifier-container ${isCropImage?'hide':''}`} >
                                     <img className='mainImg' src={process.env.PUBLIC_URL + "/images/ten.jpg"} id='mainimage' alt='' />
                                 </div>
                                 {/* rectangle */}
@@ -243,6 +327,17 @@ const Layout = ({ children }) => {
                                 })}
                                 {/* polygon */}
                                 {isPolygon ? <Canvas/> : null}
+                                {/* Crop */}
+                                {isCropImage && 
+                    <>
+                        <ReactCrop 
+                            crop={crop} 
+                            onChange={c => setCrop(c)}
+                            onComplete={(c) => setCompletedCrop(c)}>
+                            <img src={process.env.PUBLIC_URL + "/images/ten.jpg"} style={cropStyle}/>
+                        </ReactCrop>
+                    </> 
+                }
 
                             </div>
                         </td>
