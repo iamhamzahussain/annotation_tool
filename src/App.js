@@ -4,7 +4,7 @@ import Layout from "component/layoutannotation";
 function App() {
   return (
     <div style={{height:'100vh'
-    // ,overflow:'hidden'
+    ,overflow:'hidden'
     }}>
       <h1 className="header">Annotation Tool Component</h1>
       <Layout/>
