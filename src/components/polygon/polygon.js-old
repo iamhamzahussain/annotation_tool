@@ -1,0 +1,288 @@
+// import React, { useRef, useEffect, useState } from "react";
+// import "./polygon.css";
+
+// const Polygon = (props) => {
+//   const ref = useRef();
+//   const newPoint = {
+//     left: 30,
+//     top: 30,
+//     stable: false,
+//   };
+//   const [polygon, setPolygone] = useState([[newPoint]]);
+
+//   const addPoint = () => {
+//     const lastArr = polygon[polygon.length - 1];
+//     const newArr = polygon.map((item, index) => {
+//       if (index == polygon.length - 1) {
+//         return [...lastArr, newPoint];
+//       } else {
+//         return item;
+//       }
+//     });
+//     setPolygone(newArr);
+//   };
+
+//   const setPoint = (event) => {
+//     const elemIndex = polygon[polygon.length - 1].length - 1;
+//     const lastArr = polygon[polygon.length - 1];
+//     if (lastArr[elemIndex].stable == false) {
+//       const updatedArr = polygon[polygon.length - 1].map((item, index) => {
+//         if (index == polygon[polygon.length - 1].length - 1) {
+//           return { ...item, left: event.screenX - 285, top: event.clientY - 95};
+//         } else {
+//           return item;
+//         }
+//       });
+
+//       const newArr = polygon.map((item, index) => {
+//         if (index == polygon.length - 1) {
+//           return updatedArr;
+//         } else {
+//           return item;
+//         }
+//       });
+//       setPolygone(newArr);
+//     }
+//   };
+
+//   const handleClick = () => {
+//     const updatedArr = polygon[polygon.length - 1].map((item, index) => {
+//       if (index == polygon[polygon.length - 1].length - 1) {
+//         return { ...item, stable: true };
+//       } else {
+//         return item;
+//       }
+//     });
+
+//     const newArr = polygon.map((item, index) => {
+//       if (index == polygon.length - 1) {
+//         return updatedArr;
+//       } else {
+//         return item;
+//       }
+//     });
+//     setPolygone(newArr);
+//   };
+
+//     useEffect(() => {
+//       if (ref.current) {
+//         const canvas = document.getElementById("myCanvas");
+//         let ctx = ref.current.getContext("2d");
+//         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+//         polygon.map((item, index) => {
+//             item.map((innerItem,innerIndex)=>{
+//                 if(innerIndex==0){
+//                     ctx.beginPath();
+//                     ctx.moveTo(innerItem.left, innerItem.top);
+//                 }
+//                 if(innerIndex!=0){
+//                     ctx.lineTo(innerItem.left, innerItem.top);
+//                 }
+//                 if(innerIndex == item.length -1){
+//                   ctx.closePath()
+//                   ctx.stroke();
+//                 }
+//             })
+
+//         });
+        
+//       }
+//     }, [polygon]);
+
+//     useEffect(()=>{ if(props.addPoint !=0) addPoint()},[props.addPoint])
+    
+
+//   return (
+//     <div >
+//       <canvas
+//         id="myCanvas"
+//         onMouseMove={(e) => {
+//           setPoint(e);
+          
+//         }}
+//         onClick={(e) => {
+//           handleClick(e);
+//         }}
+//         ref={ref}
+//         width={"845"}
+//         height={"482"}
+//         style={{border: "2px solid gray" }}
+//       ></canvas>
+//       {polygon.map((item, index) => {
+//         return (
+//           <div key={index}>
+//             {item.map((innerItem, innerIndex) => {
+//               return (
+//                 <div
+//                   key={innerIndex}
+//                   className="point"
+//                   style={{ top: innerItem.top - 8, left: innerItem.left - 8 }}
+//                 ></div>
+//               );
+//             })}
+//           </div>
+//         );
+//       })}
+
+//     </div>
+//   );
+// };
+
+// export default Polygon;
+
+
+// import React, { useRef, useEffect, useState } from "react";
+// import "./polygon.css";
+
+// const Polygon = () => {
+//   const ref = useRef();
+//   const [polygon, setPolygon] = useState([]);
+
+//   const setPoint = (event) => {
+//     if (event.type === "click") {
+//       const updatedPoint = {
+//         left: event.screenX - 285,
+//         top: event.clientY - 95,
+//         stable: false,
+//       };
+
+//       setPolygon((prevPolygon) => [...prevPolygon, updatedPoint]);
+//     }
+//   };
+
+//   const handleClick = () => {
+//     setPolygon((prevPolygon) => {
+//       const lastPoint = prevPolygon[prevPolygon.length - 1];
+//       const updatedLastPoint = { ...lastPoint, stable: true };
+//       return [...prevPolygon.slice(0, -1), updatedLastPoint];
+//     });
+//   };
+
+//   useEffect(() => {
+//     if (ref.current) {
+//       const canvas = ref.current;
+//       const ctx = canvas.getContext("2d");
+//       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+//       if (polygon.length > 1) {
+//         ctx.beginPath();
+//         ctx.moveTo(polygon[0].left, polygon[0].top);
+
+//         for (let i = 1; i < polygon.length; i++) {
+//           const point = polygon[i];
+//           ctx.lineTo(point.left, point.top);
+//         }
+
+//         if (polygon[0].stable) {
+//           ctx.closePath();
+//         }
+
+//         ctx.stroke();
+//       }
+//     }
+//   }, [polygon]);
+
+//   return (
+//     <div>
+//       <canvas
+//         id="myCanvas"
+//         onClick={setPoint}
+//         ref={ref}
+//         width={"845"}
+//         height={"482"}
+//         style={{ border: "2px solid gray" }}
+//       ></canvas>
+//       {polygon.map((point, index) => (
+//         <div
+//           key={index}
+//           className="point"
+//           style={{ top: point.top - 8, left: point.left - 8 }}
+//         ></div>
+//       ))}
+//     </div>
+//   );
+// };
+
+// export default Polygon;
+
+
+
+
+
+import React, { useRef, useEffect, useState } from "react";
+import "./polygon.css";
+
+const Polygon = ({ closePoint }) => {
+  const ref = useRef();
+  const [polygon, setPolygon] = useState([]);
+
+  const setPoint = (event) => {
+    if(!closePoint)
+    if (event.type === "click") {
+      const updatedPoint = {
+        left: event.screenX - 275,
+        top: event.clientY - 95,
+        stable: false,
+      };
+
+      setPolygon((prevPolygon) => [...prevPolygon, updatedPoint]);
+    }
+  };
+
+  useEffect(() => {
+    if (closePoint && polygon.length > 1) {
+      setPolygon((prevPolygon) => {
+        const lastPoint = prevPolygon[prevPolygon.length - 1];
+        const updatedLastPoint = { ...lastPoint, stable: true };
+        return [...prevPolygon, updatedLastPoint, prevPolygon[0]]; // Add close point
+      });
+    }
+  }, [closePoint]);
+
+  useEffect(() => {
+    if (ref.current) {
+      const canvas = ref.current;
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (polygon.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(polygon[0].left, polygon[0].top);
+
+        for (let i = 1; i < polygon.length; i++) {
+          const point = polygon[i];
+          ctx.lineTo(point.left, point.top);
+        }
+
+        if (polygon[0].stable && polygon[polygon.length - 1].stable) {
+          ctx.closePath();
+        }
+
+        ctx.stroke();
+      }
+    }
+  }, [polygon]);
+
+  return (
+    <div>
+      <canvas
+        id="myCanvas"
+        onClick={setPoint}
+        ref={ref}
+        width={"845"}
+        height={"482"}
+        style={{ border: "2px solid gray" }}
+      ></canvas>
+      {polygon.map((point, index) => (
+        <div
+          key={index}
+          className="point"
+          style={{ top: point.top - 5, left: point.left - 5 }}
+        ></div>
+      ))}
+    </div>
+  );
+};
+
+export default Polygon;

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Line, Circle, Group } from "react-konva";
-import { minMax, dragBoundFunc } from "utils";
+import { minMax, dragBoundFunc } from "../../utils";
 /**
  *
  * @param {minMaxX} props
@@ -62,7 +62,7 @@ const PolygonAnnotation = (props) => {
         stroke="#00F1FF"
         strokeWidth={3}
         closed={isFinished}
-        fill="rgb(140,30,255,0.5)"
+        /* fill="rgb(140,30,255,0.5)" */
       />
       {points.map((point, index) => {
         const x = point[0] - vertexRadius / 2;

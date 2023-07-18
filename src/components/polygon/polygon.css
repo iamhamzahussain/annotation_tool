@@ -1,0 +1,11 @@
+.point{
+    padding: 5px;
+    border-radius: 9999px;
+    border: 2px solid blue;
+    background-color: rgba(252, 252, 15,0.6);
+    position: absolute;
+}
+#myCanvas{
+    position: absolute;
+    top: 0px;
+}
