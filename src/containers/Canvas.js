@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState, useEffect } from "react";
+import React, { useMemo, useRef, useState, useEffect, useImperativeHandle } from "react";
 import PolygonAnnotation from "../components/polygon/PolygonAnnotation";
 import { Stage, Layer, Image } from "react-konva";
 import Button from "../components/polygon/Button";
@@ -17,21 +17,22 @@ const columnStyle = {
   marginTop: 0,
   backgroundColor: "aliceblue",
 };
-const Canvas = (props) => {
+const Canvas = React.forwardRef((props, ref) => {
   const [image, setImage] = useState();
   const imageRef = useRef(null);
-  const dataRef = useRef(null);
+  //const dataRef = useRef(null);
   const [points, setPoints] = useState([]);
   const [size, setSize] = useState({});
   const [flattenedPoints, setFlattenedPoints] = useState();
   const [position, setPosition] = useState([0, 0]);
   const [isMouseOverPoint, setMouseOverPoint] = useState(false);
   const [isPolyComplete, setPolyComplete] = useState(false);
-  const {videoSource, imgBrightness} = props;
+  const [redoPoints, setRedoPoints] = useState([]);
+  const { videoSource, imgBrightness } = props;
   const videoElement = useMemo(() => {
     const element = new window.Image();
     element.width = 1260;
-    element.height = 650;
+    element.height = 640;
     element.src = videoSource;
     element.style = imgBrightness;
     return element;
@@ -99,14 +100,33 @@ const Canvas = (props) => {
     );
   }, [points, isPolyComplete, position]);
   const undo = () => {
-    setPoints(points.slice(0, -1));
-    setPolyComplete(false);
-    setPosition(points[points.length - 1]);
+    if (points.length > 0) {
+      const lastPoint = points[points.length - 1];
+      setPoints(points.slice(0, -1));
+      setRedoPoints([...redoPoints, lastPoint]); // Add the undone point to the redo history
+      setPosition(lastPoint);
+    }
   };
+
+  const redo = () => {
+    if (redoPoints.length > 0) {
+      const lastRedoPoint = redoPoints[redoPoints.length - 1];
+      setRedoPoints(redoPoints.slice(0, -1));
+      setPoints([...points, lastRedoPoint]); // Add the redone point back to the points array
+      setPosition(lastRedoPoint);
+    }
+  };
+
   const reset = () => {
     setPoints([]);
+    setRedoPoints([]);
     setPolyComplete(false);
+    setPosition(null);
   };
+  useImperativeHandle(ref, () => ({
+    undo: undo,
+    redo: redo
+  }));
   const handleGroupDragEnd = (e) => {
     //drag end listens other children circles' drag end event
     //...that's, why 'name' attr is added, see in polygon annotation part
@@ -120,7 +140,11 @@ const Canvas = (props) => {
       setPoints(result);
     }
   };
-console.log(imgBrightness)
+  useEffect(()=>{
+    const data = JSON.stringify(points)
+    console.log('Data',data)
+  },[points])
+  // console.log(imgBrightness)
   return (
     <div style={wrapperStyle}>
       <div style={columnStyle}>
@@ -157,8 +181,11 @@ console.log(imgBrightness)
             alignItems: "center",
           }}
         >
-          <Button name="Undo" onClick={undo} />
-          <Button name="Reset" onClick={reset} />
+          <div className="dn">
+            {/* <Button name="Undo" onClick={undo} /> */}
+            <Button name="Reset" onClick={reset} />
+            {/* <Button name="Redo " onClick={redo} /> */}
+          </div>
         </div>
       </div>
       {/* <div
@@ -174,6 +201,6 @@ console.log(imgBrightness)
       </div> */}
     </div>
   );
-};
+});
 
 export default Canvas;

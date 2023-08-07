@@ -10,6 +10,8 @@ const Button = ({ name, onClick }) => {
         backgroundColor: "#FF019A",
         border: "none",
         borderRadius: ".4rem",
+        position:"relative",
+        bottom:'50px'
       }}
       onClick={onClick}
     >
